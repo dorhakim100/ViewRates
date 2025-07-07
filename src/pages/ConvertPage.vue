@@ -13,16 +13,10 @@ const defaultFlagUrl = 'https://flagcdn.com/w40/un.png'
 
 const from = reactive<InputOptions>({
   amount: 0,
-  currency: 'usd',
+  currency: 'ils',
 })
 
-const toCurrencies = reactive<InputOptions[]>([
-  {
-    amount: 0,
-    currency: 'ils',
-    multiply: multiply,
-  },
-])
+const toCurrencies = reactive<InputOptions[]>([_getDefaultCurrency()])
 
 const currencyOptions = [
   { label: 'USD', value: 'usd', img: 'https://flagcdn.com/w40/us.png' },
@@ -32,8 +26,11 @@ const currencyOptions = [
 
 function calcCurrecy() {
   toCurrencies.forEach((option) => {
-    if (option.multiply) option.amount = from.amount * option.multiply
-    // option.amount = from.amount * multiply
+    if (option.multiply) {
+      const rate = getExchangeRate(from.currency, option.currency)
+      option.multiply = rate
+      option.amount = +(from.amount * rate).toFixed(2)
+    }
   })
 }
 
@@ -44,7 +41,18 @@ function _findIcon(value: string) {
 }
 
 function onAddCurrency() {
-  toCurrencies.push(_getDefaultCurrency())
+  const available = currencyOptions.find(
+    (opt) => !toCurrencies.some((cur) => cur.currency === opt.value),
+  )
+
+  if (available) {
+    toCurrencies.push({
+      amount: 1,
+      currency: available.value,
+      multiply: 1,
+    })
+    calcCurrecy()
+  }
 }
 
 function onRemoveCurrency(idx: number) {
@@ -57,6 +65,12 @@ function _getDefaultCurrency() {
     currency: 'usd',
     multiply: multiply,
   }
+}
+
+function getExchangeRate(from: string, to: string): number {
+  if (from === 'usd' && to === 'ils') return 3.3
+  if (from === 'usd' && to === 'eur') return 0.92
+  return 1
 }
 </script>
 
@@ -86,6 +100,7 @@ function _getDefaultCurrency() {
           outlined
           input-class="text-right"
           @update:model-value="calcCurrecy"
+          min="0"
         />
 
         <!-- <q-btn round color="primary" size="sm" /> -->
@@ -115,6 +130,7 @@ function _getDefaultCurrency() {
             outlined
             input-class="text-right"
             class="q-ml-md"
+            min="0"
           />
           <q-btn @click="onRemoveCurrency(idx)" round color="red" size="sm" icon="delete" />
         </div>
