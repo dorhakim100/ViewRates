@@ -2,11 +2,9 @@
 import { ref, reactive } from 'vue'
 // import type { Ref } from 'vue'
 
-interface InputOptions {
-  amount: number
-  currency: string
-  multiply?: number
-}
+import { currencyOptions } from '../data/currencies'
+
+import { InputOptions } from '../types/InputOptions/Input.options'
 
 const multiply = 3.3
 const defaultFlagUrl = 'https://flagcdn.com/w40/un.png'
@@ -18,11 +16,11 @@ const from = reactive<InputOptions>({
 
 const toCurrencies = reactive<InputOptions[]>([_getDefaultCurrency()])
 
-const currencyOptions = [
-  { label: 'USD', value: 'usd', img: 'https://flagcdn.com/w40/us.png' },
-  { label: 'EUR', value: 'eur', img: 'https://flagcdn.com/w40/eu.png' },
-  { label: 'ILS', value: 'ils', img: 'https://flagcdn.com/w40/il.png' },
-]
+// const currencyOptions = [
+//   { label: 'USD', value: 'usd', img: 'https://flagcdn.com/w40/us.png' },
+//   { label: 'EUR', value: 'eur', img: 'https://flagcdn.com/w40/eu.png' },
+//   { label: 'ILS', value: 'ils', img: 'https://flagcdn.com/w40/il.png' },
+// ]
 
 function calcCurrecy() {
   toCurrencies.forEach((option) => {
@@ -90,6 +88,7 @@ function getExchangeRate(from: string, to: string): number {
           class="currency-code q-ml-sm"
           emit-value
           map-options
+          popup-content-class="currency-dropdown"
         />
 
         <q-input
@@ -122,6 +121,7 @@ function getExchangeRate(from: string, to: string): number {
             class="currency-code q-ml-sm"
             emit-value
             map-options
+            popup-content-class="currency-dropdown"
           />
           <q-input
             v-model="option.amount"
@@ -171,5 +171,10 @@ function getExchangeRate(from: string, to: string): number {
 .currency-code {
   font-weight: 500;
   font-size: 1.2rem;
+}
+
+::v-deep(.currency-dropdown) {
+  max-height: 200px;
+  overflow-y: auto;
 }
 </style>
