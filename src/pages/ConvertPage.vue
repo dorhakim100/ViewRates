@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 // import type { Ref } from 'vue'
+
+import { getExchangeRates } from '../services/currency.service/currency.service'
 
 import { currencyOptions } from '../data/currencies'
 
@@ -16,11 +18,12 @@ const from = reactive<InputOptions>({
 
 const toCurrencies = reactive<InputOptions[]>([_getDefaultCurrency()])
 
-// const currencyOptions = [
-//   { label: 'USD', value: 'usd', img: 'https://flagcdn.com/w40/us.png' },
-//   { label: 'EUR', value: 'eur', img: 'https://flagcdn.com/w40/eu.png' },
-//   { label: 'ILS', value: 'ils', img: 'https://flagcdn.com/w40/il.png' },
-// ]
+watch(
+  () => from.currency,
+  () => {
+    updateRates()
+  },
+)
 
 function calcCurrecy() {
   toCurrencies.forEach((option) => {
@@ -69,6 +72,22 @@ function getExchangeRate(from: string, to: string): number {
   if (from === 'usd' && to === 'ils') return 3.3
   if (from === 'usd' && to === 'eur') return 0.92
   return 1
+}
+
+async function updateRates() {
+  const symbols = toCurrencies.map((cur) => cur.currency)
+  const rates = await getExchangeRates(from.currency, symbols)
+  console.log(rates)
+
+  toCurrencies.forEach((option) => {
+    if (!option.multiply) return
+    option.multiply = rates.find(
+      (rate) => rate.name === (from.currency + option.currency).toUpperCase(),
+    )?.multiply
+    if (!option.multiply) return
+
+    option.amount = from.amount * option.multiply
+  })
 }
 </script>
 
