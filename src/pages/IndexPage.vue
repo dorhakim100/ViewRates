@@ -1,18 +1,12 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
-  </q-page>
+  <home-carousel></home-carousel>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { Todo, Meta } from 'components/models'
 import ExampleComponent from 'components/ExampleComponent.vue'
+import HomeCarousel from 'src/components/HomeCarousel.vue'
 
 const todos = ref<Todo[]>([
   {

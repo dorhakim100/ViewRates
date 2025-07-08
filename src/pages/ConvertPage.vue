@@ -72,6 +72,7 @@ async function updateRates() {
 
 <template>
   <div class="container">
+    <h2 class="q-ma-none">Currency</h2>
     <q-card class="q-pa-md column gap-md" flat bordered>
       <!-- FROM Currency -->
       <CurrencyComponent :option="from" :isFrom="true" @update="updateRates" />
@@ -94,9 +95,14 @@ async function updateRates() {
 
 <style scoped lang="scss">
 .container {
+  padding: 1em;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+h2 {
+  margin-bottom: 1rem;
 }
 </style>
