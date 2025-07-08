@@ -7,7 +7,7 @@ export async function getExchangeRates(base: string, symbols: string[]) {
   const url = `https://api.exchangerate.host/live`
   const params = {
     access_key: apiKey,
-    base,
+    source: base,
     symbols: symbols.join(','),
   }
 

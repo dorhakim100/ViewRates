@@ -1,36 +1,32 @@
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, onMounted } from 'vue'
 // import type { Ref } from 'vue'
 
 import { getExchangeRates } from '../services/currency.service/currency.service'
+import { formatNumberToString } from '../services/utils.service'
 
 import { currencyOptions } from '../data/currencies'
 
 import { InputOptions } from '../types/InputOptions/Input.options'
 
-const multiply = 3.3
+const multiply = 0.29
 const defaultFlagUrl = 'https://flagcdn.com/w40/un.png'
 
 const from = reactive<InputOptions>({
-  amount: 0,
+  amount: 1,
   currency: 'ils',
 })
 
 const toCurrencies = reactive<InputOptions[]>([_getDefaultCurrency()])
 
-watch(
-  () => from.currency,
-  () => {
-    updateRates()
-  },
-)
+onMounted(() => updateRates())
 
-function calcCurrecy() {
+watch(() => [from.amount, from.currency, toCurrencies.length], updateRates)
+
+function calcCurrency() {
   toCurrencies.forEach((option) => {
     if (option.multiply) {
-      const rate = getExchangeRate(from.currency, option.currency)
-      option.multiply = rate
-      option.amount = +(from.amount * rate).toFixed(2)
+      option.amount = +(from.amount * option.multiply).toFixed(2)
     }
   })
 }
@@ -52,7 +48,7 @@ function onAddCurrency() {
       currency: available.value,
       multiply: 1,
     })
-    calcCurrecy()
+    calcCurrency()
   }
 }
 
@@ -60,7 +56,7 @@ function onRemoveCurrency(idx: number) {
   toCurrencies.splice(idx, 1)
 }
 
-function _getDefaultCurrency() {
+function _getDefaultCurrency(): InputOptions {
   return {
     amount: 1,
     currency: 'usd',
@@ -68,25 +64,23 @@ function _getDefaultCurrency() {
   }
 }
 
-function getExchangeRate(from: string, to: string): number {
-  if (from === 'usd' && to === 'ils') return 3.3
-  if (from === 'usd' && to === 'eur') return 0.92
-  return 1
-}
-
 async function updateRates() {
   const symbols = toCurrencies.map((cur) => cur.currency)
   const rates = await getExchangeRates(from.currency, symbols)
-  console.log(rates)
 
   toCurrencies.forEach((option) => {
     if (!option.multiply) return
+    if (option.currency === from.currency) {
+      option.multiply = 1
+      return
+    }
     option.multiply = rates.find(
       (rate) => rate.name === (from.currency + option.currency).toUpperCase(),
     )?.multiply
+
     if (!option.multiply) return
 
-    option.amount = from.amount * option.multiply
+    option.amount = +(from.amount * option.multiply).toFixed(2)
   })
 }
 </script>
@@ -107,6 +101,7 @@ async function updateRates() {
           class="currency-code q-ml-sm"
           emit-value
           map-options
+          @update:model-value="updateRates"
           popup-content-class="currency-dropdown"
         />
 
@@ -117,7 +112,7 @@ async function updateRates() {
           dense
           outlined
           input-class="text-right"
-          @update:model-value="calcCurrecy"
+          @update:model-value="calcCurrency"
           min="0"
         />
 
@@ -141,6 +136,7 @@ async function updateRates() {
             emit-value
             map-options
             popup-content-class="currency-dropdown"
+            @update:model-value="updateRates"
           />
           <q-input
             v-model="option.amount"
@@ -154,7 +150,9 @@ async function updateRates() {
           <q-btn @click="onRemoveCurrency(idx)" round color="red" size="sm" icon="delete" />
         </div>
         <div class="text-caption text-grey-7 q-mt-xs q-ml-lg">
-          {{ `1 ${option.currency.toUpperCase()} = ${option.multiply} ILS` }}
+          {{
+            `1 ${from.currency.toUpperCase()} = ${option.multiply} ${option.currency.toUpperCase()}`
+          }}
         </div>
       </div>
       <div class="q-mt-md" @click="onAddCurrency">
@@ -190,10 +188,5 @@ async function updateRates() {
 .currency-code {
   font-weight: 500;
   font-size: 1.2rem;
-}
-
-::v-deep(.currency-dropdown) {
-  max-height: 200px;
-  overflow-y: auto;
 }
 </style>
