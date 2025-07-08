@@ -4,3 +4,12 @@ export function formatNumberToString(value: number): string {
     maximumFractionDigits: 2,
   })
 }
+
+export function getDefaultCurrency() {
+  const multiply = 0.29
+  return {
+    amount: 1,
+    currency: 'usd',
+    multiply: multiply,
+  }
+}
