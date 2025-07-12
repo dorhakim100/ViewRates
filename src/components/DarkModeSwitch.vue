@@ -1,20 +1,30 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+
+import { useSystemStore } from 'src/stores/system'
+import { storeToRefs } from 'pinia'
 
 import { outlinedNightlightRound } from '@quasar/extras/material-icons-outlined'
 import { outlinedWbSunny } from '@quasar/extras/material-icons-outlined'
 
-const isDarkMode = ref(false)
+const store = useSystemStore()
+const { setPrefs } = store
+const { prefs, isDarkMode } = storeToRefs(store)
+
+function onToggle() {
+  setPrefs({ ...prefs.value, isDarkMode: !isDarkMode.value })
+}
 </script>
 
 <template>
   <div class="container">
     <div>
       <q-toggle
-        v-model="isDarkMode"
+        :model-value="isDarkMode"
         :checked-icon="outlinedNightlightRound"
         color="black"
         :unchecked-icon="outlinedWbSunny"
+        @update:model-value="onToggle"
       />
     </div>
   </div>

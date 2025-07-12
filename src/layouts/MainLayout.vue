@@ -1,5 +1,8 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout
+    view="lHh Lpr lFf"
+    :class="{ 'bg-grey-1 text-black': !isDarkMode, 'bg-dark text-white': isDarkMode }"
+  >
     <q-header elevated>
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
@@ -9,8 +12,13 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
+    <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+      :class="isDarkMode ? 'bg-dark text-white' : 'bg-white text-black'"
+    >
+      <q-list v-bind:dark="isDarkMode">
         <!-- <q-item-label header> Essential Links </q-item-label> -->
 
         <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
@@ -30,9 +38,16 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useSystemStore } from '../stores/system'
+import { storeToRefs } from 'pinia'
+
 import { useRoute } from 'vue-router'
+
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue'
 import DarkModeSwitch from '../components/DarkModeSwitch.vue'
+
+const systemStore = useSystemStore()
+const { isDarkMode } = storeToRefs(systemStore)
 
 const linksList: EssentialLinkProps[] = [
   {
