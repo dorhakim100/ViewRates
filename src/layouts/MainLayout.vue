@@ -5,6 +5,7 @@
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title> ViewRates </q-toolbar-title>
+        <DarkModeSwitch />
       </q-toolbar>
     </q-header>
 
@@ -19,6 +20,11 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+    <q-footer elevated>
+      <q-toolbar>
+        <q-toolbar-title>Footer</q-toolbar-title>
+      </q-toolbar>
+    </q-footer>
   </q-layout>
 </template>
 
@@ -26,6 +32,7 @@
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue'
+import DarkModeSwitch from '../components/DarkModeSwitch.vue'
 
 const linksList: EssentialLinkProps[] = [
   {

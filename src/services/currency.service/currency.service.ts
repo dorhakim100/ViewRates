@@ -11,14 +11,15 @@ export async function getExchangeRates(base: string, symbols: string[]) {
   }
 
   try {
-    const res = await axios.get(url, { params })
-    const { quotes } = res.data
+    // const res = await axios.get(url, { params })
+    // const { quotes } = res.data
     let rates
     const updatedSymbols = symbols.map((symbol) => {
       symbol = base + symbol
       return symbol.toUpperCase()
     })
-    if (!res.data.success) {
+    if (true) {
+      // if (!res.data.success) {
       rates = updatedSymbols.map((symbol) => {
         return {
           multiply: _getRandomMultiply(),
