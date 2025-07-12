@@ -1,10 +1,32 @@
 import { Prefs } from 'src/types/Prefs/Prefs'
 
+const SITENAME_PREFS = 'quasar-starter-prefs'
+
 export const systemService = {
-  getDefaultPrefs,
+  getPrefs,
+  setPrefs,
 }
 
-function getDefaultPrefs(): Prefs {
+function getPrefs() {
+  const entityType = SITENAME_PREFS
+  let prefs
+  const stringifyPrefs = localStorage.getItem(entityType)
+  if (!stringifyPrefs) {
+    prefs = _getDefaultPrefs()
+    localStorage.setItem(entityType, JSON.stringify(prefs))
+  } else {
+    prefs = JSON.parse(stringifyPrefs)
+  }
+
+  return prefs
+}
+
+function setPrefs(prefs: Prefs) {
+  const entityType = SITENAME_PREFS
+  localStorage.setItem(entityType, JSON.stringify(prefs))
+}
+
+function _getDefaultPrefs() {
   return {
     isDarkMode: false,
   }

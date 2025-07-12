@@ -5,7 +5,7 @@ import { Prefs } from 'src/types/Prefs/Prefs'
 
 export const useSystemStore = defineStore('system', {
   state: () => ({
-    prefs: systemService.getDefaultPrefs(),
+    prefs: systemService.getPrefs(),
     isLoading: false,
   }),
 
@@ -17,6 +17,7 @@ export const useSystemStore = defineStore('system', {
   actions: {
     setPrefs(prefsToSet: Prefs) {
       this.prefs = prefsToSet
+      systemService.setPrefs(prefsToSet)
     },
     setIsLoading(stateToSet: boolean) {
       this.isLoading = stateToSet
